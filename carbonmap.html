@@ -1,0 +1,606 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>TSS Carbon map prototype</title>
+    <script type='text/javascript' src='http://maps.googleapis.com/maps/api/js?sensor=false'></script>
+    <link rel='stylesheet' type='text/css' href='scripts/bootstrap/css/bootstrap.min.css' />
+    <link href="fonts/ss-standard.css" rel="stylesheet" />
+    <link rel='stylesheet' type='text/css' href='browser.css' />
+    <script type='text/javascript' src='scripts/jquery-1.7.2.min.js'></script>
+    <!--<script type='text/javascript' src='scripts/bootstrap/js/bootstrap-transition.js'></script>-->
+    <script type='text/javascript' src='scripts/bootstrap/js/bootstrap-button.js'></script>
+    <script type='text/javascript' src='scripts/bootstrap/js/bootstrap-modal.js'></script>
+    <script type='text/javascript' src='scripts/bootstrap/js/bootstrap-tooltip.js'></script>
+    <script type='text/javascript' src='scripts/bootstrap/js/bootstrap-popover.js'></script>
+    <script type='text/javascript' src='carbonmap.js'></script>
+    <script type="text/javascript">
+
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-32798141-1']);
+        _gaq.push(['_setDomainName', 'tyeesolutions.org']);
+        _gaq.push(['_trackPageview']);
+
+        (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+        })();
+
+    </script>
+</head>
+<body>
+    <div class='container'>
+        <div id='mapWrapper'>
+            <div id='map'> </div>
+        </div>
+        <div id='controls'>
+            <table id='types'>
+                <thead>
+                    <tr>
+                        <th class='typeName'>
+                            Carbon<br>
+                            sinks & sources
+                            <a href="#"
+                               class="infoIcon"
+                               id="typesTip"
+                               rel="popover"
+                               title="sinks and sources"
+                            > <i class="ss-icon">&#x2753;</i>
+                            </a>
+                        </th>
+                        <th class="info">
+                        </th>
+                        <th class="quantity" colspan="2">
+                            CO<sub>2</sub><br>
+                            tonnes/year
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="type" id='forests'>
+                        <td class='typeName'>
+                            <a
+                                data-toggle="modal"
+                                href="#forestInfo"
+                            >Forests</a>
+                        </td>
+                        <td class='info'>
+                            <a
+                                data-toggle="modal"
+                                href="#forestInfo"
+                                rel="tooltip"
+                                class="infoIcon"
+                            ><i class="ss-icon">&#x2753;</i></a>
+                        </td>
+                        <td class='btn-group toggle' data-toggle='buttons-radio'>
+                            <button class='btn on'>on</button>
+                            <button class='btn off'>off</button>
+                        </td>
+                        <td class='quantity inactive'>0</td>
+                    </tr>
+                    <tr class="type"  id='blue'>
+                        <td class='typeName'>
+                            <a
+                                data-toggle="modal"
+                                href="#blueInfo"
+                            >Eel grass & salt marsh</a>
+                        </td>
+                        <td class="info">
+                            <a
+                                data-toggle="modal"
+                                href="#blueInfo"
+                                rel="tooltip"
+                                class="infoIcon"
+                            ><i class="ss-icon">&#x2753;</i></a>
+                        </td>
+                        <td class='btn-group toggle' data-toggle='buttons-radio'>
+                            <button class='btn on'>on</button>
+                            <button class='btn off'>off</button>
+                        </td>
+                        <td class='quantity inactive'>0</td>
+                    </tr>
+                    <tr class="type"  id='communities'>
+                        <td class='typeName'>
+                            <a
+                                data-toggle="modal"
+                                href="#communitiesInfo"
+                            >Communities</a>
+                        </td>
+                        <td class="info">
+                            <a
+                                data-toggle="modal"
+                                href="#communitiesInfo"
+                                rel="tooltip"
+                                class="infoIcon"
+                            ><i class="ss-icon">&#x2753;</i></a>
+                        </td>
+                        <td class='btn-group toggle' data-toggle='buttons-radio'>
+                            <button class='btn on'>on</button>
+                            <button class='btn off'>off</button>
+                        </td>
+                        <td class='quantity inactive'>0</td>
+                    </tr>
+                    <tr class="type"  id='traffic'>
+                        <td class='typeName'>
+                            <a
+                                data-toggle="modal"
+                                href="#trafficInfo"
+                            >Highways</a>
+                        </td>
+                        <td class="info">
+                            <a
+                                data-toggle="modal"
+                                href="#trafficInfo"
+                                rel="tooltip"
+                                class="infoIcon"
+                            ><i class="ss-icon">&#x2753;</i></a>
+                        </td>
+                        <td class='btn-group toggle' data-toggle='buttons-radio'>
+                            <button class='btn on'>on</button>
+                            <button class='btn off'>off</button>
+                        </td>
+                        <td class='quantity inactive'>0</td>
+                    </tr>
+                    <tr class="type"  id='facilities'>
+                        <td class='typeName'>
+                            <a
+                                data-toggle="modal"
+                                href="#facilitiesInfo"
+                            >Industrial facilities</a>
+                        </td>
+                        <td class="info">
+                            <a
+                                data-toggle="modal"
+                                href="#facilitiesInfo"
+                                rel="tooltip"
+                                class="infoIcon"
+                            ><i class="ss-icon">&#x2753;</i></a>
+                        </td>
+                        <td class='btn-group toggle' data-toggle='buttons-radio'>
+                            <button class='btn on'>on</button>
+                            <button class='btn off'>off</button>
+                        </td>
+                        <td class='quantity inactive'>0</td>
+                    </tr>
+                    <tr class="type"  id='balance'>
+                        <td class='totalLabel' colspan="3">
+                            Balance:
+                        </td>
+                        <td class='quantity inactive'>
+                            0
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table id="legend">
+                <tr id="units">
+                    <td colspan="3" id="title">
+                        Legend
+                        <a href="#"
+                           class="infoIcon"
+                           id="legendTip"
+                           rel="popover"
+                           title="Legend"
+                        >
+                            <i class="ss-icon">&#x2753;</i>
+                        </a>
+                    </td>
+                    <td></td>
+                    <td colspan="2">
+                    </td>
+                    <td></td>
+                    <td class="poly units" colspan="2">
+                        CO<sub>2</sub> / km<sup>2</sup> / yr<br>
+                        (tonnes)
+                    </td>
+                </tr>
+                <tr id="class1">
+                    <td class="point symbolWrapper">
+                    </td>
+                    <td class="point fromValue">
+                    </td>
+                    <td class="point toValue">
+                    </td>
+                    <td class="line symbolWrapper">
+                        <div class="symbol"> </div>
+                    </td>
+                    <td class="line fromValue">
+                    </td>
+                    <td class="line toValue">
+                    </td>
+                    <td class="poly symbolWrapper">
+                        <div class="symbol"> </div>
+                    </td>
+                    <td class="poly fromValue">
+                        - 2,000
+                    </td>
+                    <td class="poly toValue">
+                        to - 1,000
+                    </td>
+                </tr>
+                <tr id="class2">
+                    <td class="point symbolWrapper">
+                    </td>
+                    <td class="point fromValue">
+                    </td>
+                    <td class="point toValue">
+                    </td>
+                    <td class="line symbolWrapper">
+                    </td>
+                    <td class="line fromValue">
+                    </td>
+                    <td class="line toValue">
+                    </td>
+                    <td class="poly symbolWrapper">
+                        <div class="symbol"> </div>
+                    </td>
+                    <td class="poly fromValue">
+                        - 1,000
+                    </td>
+                    <td class="poly toValue">
+                        to - 500
+                    </td>
+                </tr>
+                <tr id="class3">
+                    <td class="point symbolWrapper">
+                    </td>
+                    <td class="point units" colspan="2" rowspan="2">
+                        CO<sub>2</sub> / yr<br>
+                        (tonnes)
+                    </td>
+                    <td class="line symbolWrapper">
+                    </td>
+                    <td class="line units" rowspan="2" colspan="2">
+                        CO<sub>2</sub> / km / yr<br>
+                        (tonnes)
+                    </td>
+                    <td class="poly symbolWrapper">
+                        <div class="symbol"> </div>
+                    </td>
+                    <td class="poly fromValue">
+                        - 500
+                    </td>
+                    <td class="poly toValue">
+                        to - 50
+                    </td>
+                </tr>
+                <tr id="class4">
+                    <td class="point symbolWrapper">
+                    </td>
+                    <td class="line symbolWrapper">
+                    </td>
+                    <td class="poly symbolWrapper">
+                        <div class="symbol"> </div>
+                    </td>
+                    <td class="poly fromValue">
+                        - 50
+                    </td>
+                    <td class="poly toValue">
+                        to + 50
+                    </td>
+                </tr>
+                <tr id="class5">
+                    <td class="point symbolWrapper">
+                        <div class="symbol"> </div>
+                    </td>
+                    <td class="point fromValue">
+                        0
+                    </td>
+                    <td class="point toValue">
+                        to 100,000
+                    </td>
+                    <td class="line symbolWrapper">
+                        <div class="symbol"> </div>
+                    </td>
+                    <td class="line fromValue">
+                        0
+                    </td>
+                    <td class="line toValue">
+                        to 1,000
+                    </td>
+                    <td class="poly symbolWrapper">
+                        <div class="symbol"> </div>
+                    </td>
+                    <td class="poly fromValue">
+                        50
+                    </td>
+                    <td class="poly toValue">
+                        to 500
+                    </td>
+                </tr>
+                <tr id="class6">
+                    <td class="point symbolWrapper">
+                        <div class="symbol"> </div>
+                    </td>
+                    <td class="point fromValue">
+                        100,000
+                    </td>
+                    <td class="point toValue">
+                        to 500,000
+                    </td>
+                    <td class="line symbolWrapper">
+                        <div class="symbol"> </div>
+                    </td>
+                    <td class="line fromValue">
+                        1,000
+                    </td>
+                    <td class="line toValue">
+                        to 5,000
+                    </td>
+                    <td class="poly symbolWrapper">
+                        <div class="symbol"> </div>
+                    </td>
+                    <td class="poly fromValue">
+                        500
+                    </td>
+                    <td class="poly toValue">
+                        to 5,000
+                    </td>
+                </tr>
+                <tr id="class7">
+                    <td class="point symbolWrapper">
+                        <div class="symbol"> </div>
+                    </td>
+                    <td class="point fromValue">
+                        500,000
+                    </td>
+                    <td class="point toValue">
+                        to 1,300,000
+                    </td>
+                    <td class="line symbolWrapper">
+                        <div class="symbol"> </div>
+                    </td>
+                    <td class="line fromValue">
+                        5,000
+                    </td>
+                    <td class="line toValue">
+                        to 8,000
+                    </td>
+                    <td class="poly symbolWrapper">
+                        <div class="symbol"> </div>
+                    </td>
+                    <td class="poly fromValue">
+                        5,000
+                    </td>
+                    <td class="poly toValue">
+                        to 20,000
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="footer">
+            <a data-toggle="modal"
+               id="instructionsLink"
+               href="#instructionsModal"
+               title="open a pop-up with instructions for the map"
+                    >Instructions</a>.
+            <a data-toggle="modal"
+               id="embedLink"
+               href="#embedModal"
+               title="HTML to copy and paste into your own site"
+                    >Embed</a> this on your site.
+            Created by
+            <a href="http://www.tyeesolutions.org" title="open the TSS website in a new window" target="_blank">
+                Tyee Solutions Society
+            </a>
+            and
+            <a href="http://geocology.ca" title="open the Geocology website in a new window"  target="_blank">
+                Geocology Research</a>.
+        </div>
+    </div>
+    <div class="modal" id="instructionsModal">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">x</button>
+            <h3>How to use the BC Carbon Map</h3>
+        </div>
+        <div class="modal-body">
+            <p>The map (right) shows carbon sinks and sources. The table (left) shows the number of tonnes being emitted or removed from the atmosphere each year.</p>
+            <p><strong>Zoom</strong> the map to target the carbon balance table on the left. Only the visible sources and sinks are included in the calculations.</p>
+            <p><strong>Click</strong> roads, facilities, communities or land-cover on map for more information.</p>
+            <p><strong>Click</strong> on/off buttons on left to show a carbon sink/source in the map and in the calculations.</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn btn-primary" data-dismiss="modal">Start using the map.</a>
+        </div>
+    </div>
+    <div class="modal hide" id="embedModal">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">x</button>
+            <h3>Embedding instructions.</h3>
+        </div>
+        <div class="modal-body">
+            <p>To embed this map on your own site copy and paste in this text:</p>
+            <p><pre>&lt;iframe src="http://tyeesolutions.org/Maps/carbon/carbonmap.html" width="100%" height="570px" style="margin: 0 auto; padding: 0; border: none;"&gt;&lt;/iframe&gt;</pre></p>
+            <p>(You may have to set your text editor to "html mode" to get it to work.)</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Close</a>
+        </div>
+    </div>
+    <div class="modal hide typeInfo" id="forestInfo">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">x</button>
+            <h3>Forest Data</h3>
+        </div>
+        <div class="modal-body">
+            <p>
+                <table>
+                    <tr>
+                        <td>
+                            <strong>Source</strong>
+                        </td>
+                        <td>
+                            Canadian Forest Service
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Year of data</strong>
+                        </td>
+                        <td>
+                            1990 to 2008
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Origin</strong>
+                        </td>
+                        <td>
+                            <a href="http://onlinelibrary.wiley.com/doi/10.1111/j.1365-2486.2010.02369.x/full" title="link to the full article in Global Change Biology">An inventory-based analysis of Canada's managed forest carbon<br> dynamics, 1990 to 2008</a>
+                        </td>
+                    </tr>
+                </table>
+            </p>
+            <p>The Canadian Forest Service provided Net Ecosystem Exchange values for managed forest for each of the ecozones which cover BC. The NEE values were estimated for the period from 1990 to 2008, derived from work described in <em>An inventory-based analysis of Canada's managed forest carbon dynamics, 1990 to 2008</em>.</p>
+            <p>The CFS also provided us with spatial data delineating areas of "managed forest" used in their carbon flux models. We clipped those areas to BC's borders, and applied the NEE-per-area values to the resulting patches to produce our carbon estimates. The forest data is in the form of a 1 km grid, which we transposed to the web map projection to produce the blocky rotated patches you can see.</p>
+            <p>See the <strong>Sources and Limitation</strong> and other articles accompanying this map for more information about the CFS data and other forest carbon data sources we reviewed.
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn btn-primary" data-dismiss="modal">Back to the map.</a>
+        </div>
+    </div>
+    <div class="modal hide typeInfo" id="blueInfo">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">x</button>
+            <h3>Eel Grass and Salt Marsh data</h3>
+        </div>
+        <div class="modal-body">
+            <p>
+                <table>
+                    <tr>
+                        <td><strong>Source</strong></td>
+                        <td> <a href="http://www.bcmca.ca/datafeatures/eco_vascplants_eelgrass_polygons/">Eelgrass Polygons</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Year of data</strong></td>
+                        <td>Unknown</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Origin</strong></td>
+                        <td>BC Marine Conservation Analysis</td>
+                    </tr>
+                </table>
+            </p>
+            <p>The eel grass spatial data provided by the BCMCA Marine Atlas compiles the best available information from a variety of sources.</p>
+            <p>Sierra Club marine specialist Colin Campbell provided coefficients to translate organic carbon sequestration by eelgrass and salt marshe to grams of atmospheric CO<sub>2</sub>.</p>
+            <br>
+            <p>
+                <table>
+                    <tr>
+                        <td><strong>Source</strong></td>
+                        <td><a href="https://apps.gov.bc.ca/pub/geometadata/metadataDetail.do?recordUID=34311&recordSet=ISO19115">BC Shorezone Mapping System</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Year of data</strong> </td>
+                        <td> Primarily 1995 </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Origin</strong></td>
+                        <td>BC Ministry of Forest Lands and Natural Resource Operations</td>
+                    </tr>
+                </table>
+            </p>
+            <p>The Shorezone inventory was developed by reviewing video recordings taken during helicopter and fixed-wing overflights of the BC coastline. Locations of species associated with salt marsh were drawn from the database.</p>
+            <p>See the <strong>Sources and Limitations</strong> article accompanying the map for more information about our eel grass data and the process used to construct salt marsh locations.</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn btn-primary" data-dismiss="modal">Back to the map.</a>
+        </div>
+    </div>
+    <div class="modal hide typeInfo" id="communitiesInfo">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">x</button>
+            <h3>Communities Data</h3>
+        </div>
+        <div class="modal-body">
+            <p>
+                <table>
+                    <tr>
+                        <td><strong>Source</strong></td>
+                        <td><a href="http://www.env.gov.bc.ca/cas/mitigation/ceei">Community Energy and Emissions Inventory Report</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Year of data</strong></td>
+                        <td>2007</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Origin</strong> </td>
+                        <td>BC Ministry of Environment</td>
+                    </tr>
+                </table>
+            </p>
+            <p>Municipal governments provide CEEI reports that estimate energy use and GHG emission for three primary sectors&mdash;buildings, on-road transportation and solid waste&mdash;and further provide 'supporting indicators' for housing type, residential density, commuting distances and green space.</p>
+
+            <p>We have used the most recent publicly available reports covering all BC municipalities. These date to 2007. The BC Ministry of Environment promised to release updated date for 2010 by April of 2012, but as of June 1 that deadline remains unmet.</p>
+
+            <p>We left 'District Municipalities' and 'Regional District Unincorporated Areas' off our map for the sake of legibility. Those large, rural areas cover 99% of BC but only produce 5% of (non-transport) carbon. That 5% of community carbon is consequently missing from the emissions table.</p>
+
+            <p>See the <strong>Sources and Limitation</strong> article accompanying this map for more information about CEEI, why we dropped some areas, and how we avoided double-counting of facilitiy and transportation emissions.</p>
+
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn btn-primary" data-dismiss="modal">Back to the map.</a>
+        </div>
+    </div>
+    <div class="modal hide typeInfo" id="trafficInfo">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">x</button>
+            <h3>Traffic Data</h3>
+        </div>
+        <div class="modal-body">
+            <p>
+                <table>
+                    <tr>
+                        <td><strong>Source</strong></td>
+                        <td><a href="http://www.data.gov.bc.ca/dbc/search/detail.page?recorduid=176147">Annual Traffic Volumes</a></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Year of data</strong></td>
+                        <td>2006 to 2011</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Origin</strong></td>
+                        <td>BC Ministry of Transportation and Infrastructure</td>
+                    </tr>
+                </table>
+            </p>
+            <p>We used Annual Average Daily Traffic (AADT) values recorded by the Ministry of Transporation using roadside count sites at <a href="http://www.th.gov.bc.ca/trafficData/tradas/MoreTrafficDataReports.asp">Uniform Traffic Volume</a> (UTV) segments located throughout BC. We calculated a provincial average vehicle emission value of 298 grams of CO<sub>2</sub>e per km driven using information about provincial vehicle usage and fuel efficiency from ICBC and the CEEI. For each UTV segment we multiplied our provincial emissions/km estimate by the length of the segment to produce the emissions estimate you can see on our map.</p>
+            <p>Not every UTV segment is recorded every year. For each UTV segment we took the AADT value for the most recent year. We dropped UTV segments that didn't have data more recent than 2005 from our map.</p>
+            <p>For more information about our traffic data and how we generated an estimate of 298 grams of CO<sub>2</sub>e per km see the <strong>Sources and Limitations</strong> article that accompanies this map.</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn btn-primary" data-dismiss="modal">Back to the map.</a>
+        </div>
+    </div>
+    <div class="modal hide typeInfo" id="facilitiesInfo">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">x</button>
+            <h3>Facilities Data</h3>
+        </div>
+        <div class="modal-body">
+            <p>
+            <table>
+                <tr>
+                    <td><strong>Source</strong></td>
+                    <td><a href="http://www.env.gov.bc.ca/cas/mitigation/ggrcta/reporting-regulation/2010-emissions-reports.html">Facility GHG Emissions Report Summaries</a></td>
+                </tr>
+                <tr>
+                    <td><strong>Year of data</strong></td>
+                    <td>2010</td>
+                </tr>
+                <tr>
+                    <td><strong>Origin</strong> </td>
+                    <td>BC Ministry of Environment</td>
+                </tr>
+            </table>
+            </p>
+            <p>Industrial facilities with emissions greater than 10,000 tonnes of CO2 equivalent (tCO2e) were identified for the first time by the BC provincial government in 2010. That report included map coordinates and addresses, which we used to map out the facilities.</p>
+            <p>In that report, individual facilities reporting less than 10,000 tCO2e are aggregated, by company, as "Linear Facilities". Locations are not provided. As such, we did not include them in our map or map-based calculations. Those facilities collectively emit approximately 2.9 million tCO2e per year, meaning that total facility emissions are in fact about 20 percent higher than they appear here.</p>
+            <p>See the <strong>Sources and Limitation</strong> article accompanying this map for more information.</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn btn-primary" data-dismiss="modal">Back to the map.</a>
+        </div>
+    </div>
+</body>
+</html>
